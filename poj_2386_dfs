@@ -1,0 +1,40 @@
+/*从任意的w开始，不断把邻接的部分用'.'代替，
+1次DFS后与初始这个w连接的所有w就全都被替换成'.'，
+因此直到图中不再存在W为止，总共进行DFS的次数就是答案*/
+#include <iostream>
+using namespace std;
+#define maxn 110
+char field[maxn][maxn];
+int n, m;
+void dfs(int x, int y)
+{
+    field[x][y] = '.'; //遍历过
+    for(int dx = -1; dx <= 1; dx++) //八个方向
+    {
+        for(int dy = -1; dy <= 1; dy++)
+        {
+            int nx = x + dx, ny = y + dy; //移动结果
+            if(0 <= nx && nx < n && 0 <= ny && ny < m && field[nx][ny] == 'W') //越界和是否存在
+                dfs(nx, ny);
+        }
+    }
+    return ;
+
+}
+int main(int argc, char const *argv[])
+{
+    //int n, m;
+    int cnt = 0;
+    cin >> n >> m;
+    for(int i = 0; i < n; i++)
+        cin >> field[i];
+    for(int i = 0; i < n; i++)
+        for(int j = 0; j < m; j++)
+            if(field[i][j] == 'W')
+            {
+                dfs(i, j);
+                cnt++;
+            }
+    cout << cnt << endl;
+    return 0;
+}
