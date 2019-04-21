@@ -1,0 +1,93 @@
+// http://poj.org/problem?id=2251
+// bfs & queue method
+#include <iostream>
+#include <queue>
+#include <cstring>
+using namespace std;
+
+char maze[40][40][40];
+bool vis[40][40][40]; // visit mark
+int l, r, c;
+int cnt; // final step;
+int sl, sr, sc;
+int gl, gr, gc;
+int dir [6][3] = { {0, -1, 0}, {0, 1, 0}, {0, 0, 1}, {0, 0, -1},
+                   {1, 0, 0}, {-1, 0, 0} }; // direction
+struct point // coordinate
+{
+    int z, x, y;
+    int step;
+};
+queue<point> q; // bfs&queue
+bool check(point p) // check bounds error, #, and visit;
+{
+    int x = p.x, y = p.y, z = p.z;
+    if(x < 0 ||x >= r || y < 0 || y >= c || z < 0 || z >= l) return false;
+    if(maze[z][x][y] == '#') return false;
+    if(vis[z][x][y]) return false;
+    return true;
+}
+void clear(queue<point>& q) { // each set of data, clear queue;
+    queue<point> empty;
+    swap(empty, q);
+}
+int bfs(point s, point e)
+{
+    memset(vis, 0, sizeof(vis)); // reset the mark
+    s.step = 0; // reset step;
+    vis[s.z][s.x][s.y] = 1;
+    q.push(s);
+    while(!q.empty()) // until empty
+    {
+        point now = q.front(); // process front element
+        q.pop(); // pop
+        if(now.z == e.z && now.x == e.x && now.y == e.y)    return now.step; // check if success
+        point nex; // move
+        for(int i = 0; i < 6; i++) // every conditon of move
+        {
+            nex.z=now.z+dir[i][0];
+            nex.x=now.x+dir[i][1];
+            nex.y=now.y+dir[i][2];
+            if(check(nex))
+            {
+                nex.step = now.step + 1; // step + 1;
+                q.push(nex); // enqueue
+                vis[nex.z][nex.x][nex.y] = 1; // mark
+            }
+        }
+    }
+    return 0;
+}
+
+int main()
+{
+    while(cin >> l >> r >> c && l != 0 && r != 0 && c != 0)
+    {
+
+        clear(q);
+        cnt = 0;
+        point s, e;
+        for(int i = 0; i < l; i++)
+            for(int j = 0; j < r; j++)
+                for(int k = 0; k < c; k++)
+                {
+                    cin >> maze[i][j][k];
+                    if(maze[i][j][k] == 'S')
+                    {
+                        s.z = i;
+                        s.x = j;
+                        s.y = k;
+                    }
+                    if(maze[i][j][k] == 'E')
+                    {
+                        e.z = i;
+                        e.x = j;
+                        e.y = k;
+                    }
+                }
+        cnt = bfs(s, e);
+        if(cnt)    cout << "Escaped in " << cnt << " minute(s)." << endl;
+        else cout << "Trapped!" << endl;
+    }
+    return 0;
+}
