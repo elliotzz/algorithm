@@ -1,0 +1,49 @@
+# dfs
+# easy
+// http://poj.org/problem?id=1321
+// dfs & recursion method
+#include <iostream>
+#include <cstring>
+using namespace std;
+
+char mp[10][10];
+bool mark[10]; // signs of columns
+int n, k;
+int cnt, plan; // pieces and plans
+
+void dfs(int cur)
+{
+    if(cnt == k) // check this first!
+    {   //in condition of when accessible, cur == n; cuz dfs(cur + 1);
+        plan++;
+        return ;
+    }
+    if(cur >= n) return ; // bounds error
+    for(int i = 0; i < n; i++) // traverse the row;
+    {
+        if(!mark[i] && mp[cur][i] == '#')
+        {
+            mark[i] = true;
+            cnt++;
+            dfs(cur + 1);
+            cnt--; // return last node!
+            mark[i] = false;
+        }
+    }
+    dfs(cur + 1); // next row
+}
+int main()
+{
+    while(cin >> n >> k && n != -1 && k != -1)
+    {
+        plan = 0; cnt = 0;
+        memset(mark, 0, sizeof(mark));
+        for(int i = 0; i < n; i++)
+        {
+            cin >> mp[i];
+        }
+        dfs(0); // row 0;
+        cout << plan << endl;
+    }
+    return 0;
+}
