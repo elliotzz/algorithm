@@ -1,0 +1,22 @@
+// http://poj.org/problem?id=1426
+#include <iostream>
+using namespace std;
+int n;
+bool dfs(long long x, int step) // bfs 超时
+{
+    if(step > 18) return false;  // long long精确最多18位
+    if(x % n == 0) {cout << x << endl; return true;}
+    step++;
+    if(dfs(x * 10, step)) return true;
+    else if(dfs(x * 10 + 1, step)) return true;
+    return false;
+}
+int main()
+{
+
+    while(cin >> n)
+    {
+        dfs(1, 0);
+    }
+    return 0;
+}
