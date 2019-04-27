@@ -1,0 +1,95 @@
+// http://poj.org/problem?id=3126
+#include <algorithm>
+#include <iostream>
+#include <queue>
+#include <cstring>
+using namespace std;
+#define MAX_N 9999 + 16
+int vis[MAX_N]; // 是否访问过 减少重复访问
+int dp[MAX_N]; //路径长短
+int  prime[MAX_N];          // 第i个素数
+bool is_prime[MAX_N + 1];   //is_prime[i]为真的时候表示i为素数
+int sieve(const int& n) // 欧氏筛法
+{
+    int p = 0;
+    fill(is_prime, is_prime + n + 1, true); // fill函数
+    is_prime[0] = is_prime[1] = false;
+    for (int i = 2; i <= n; ++i)
+    {
+        if (is_prime[i])
+        {
+            prime[p++] = i;
+        }
+
+        for (int j = 0; j < p && i*prime[j] <= n; j++) //不论是不是素数都要筛
+        {
+            is_prime[i*prime[j]] = false;
+            if(i % prime[j] == 0) break;
+        }
+    }
+    return p;
+}
+
+// 将number的倒数第digit位改成change
+int get_next(int number, int digit, int change)
+{
+    switch (digit)
+    {
+        case 0:
+            return number / 10 * 10 + change;
+        case 1:
+            return number / 100 * 100 + number % 10 + change * 10;
+        case 2:
+            return number / 1000 * 1000 + number % 100 + change * 100;
+        case 3:
+            return number % 1000 + change * 1000;
+    }
+    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+
+    // 先做一份素数表
+    sieve(MAX_N);
+    int N;
+    cin >> N;
+    while (N--)
+    {
+        int from, to;
+        cin >> from >> to;
+        // bfs
+        memset(dp, 0x3f, sizeof(dp)); // 0x3f巧妙
+        memset(vis, 0, sizeof(vis));
+        dp[from] = 0; //存每个数的步数
+        queue<int> q;
+        q.push(from);
+        while (q.size()) //q.size() 的巧妙
+        {
+            const int current = q.front(); q.pop();
+            if(current == to) break;
+            vis[current] = 1; // 访问过
+            for (int i = 0; i < 4; ++i)
+            {
+                for (int j = 0; j < 10; ++j)
+                {
+                    if (i == 3 && j == 0)
+                    {
+                        // 将第一位改成0是无意义的
+                        continue;
+                    }
+                    int next = get_next(current, i, j);
+                    if (is_prime[next] == false || dp[next] <= dp[current] || vis[next])
+                    {
+                        // 不是素数不行，如果到next已经有更小的那也不用这个变换路径了
+                        continue;
+                    }
+                    dp[next] = dp[current] + 1;
+                    q.push(next);
+                }
+            }
+        }
+        cout << dp[to] << endl;
+    }
+    return 0;
+}
